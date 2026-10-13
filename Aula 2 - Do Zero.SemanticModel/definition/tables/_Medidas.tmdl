@@ -1,0 +1,64 @@
+table _Medidas
+	lineageTag: abc7e643-03f7-4c20-bbc8-2663600c60c4
+
+	measure 'Total Horas' = SUM('BaseProdução'[Horas])
+		lineageTag: 47e2d6dc-88ea-482e-a606-67dd9e375fcb
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Qtd Rejeitada' = SUM('BaseProdução'[Qtd Rejeitada])
+		formatString: #,0
+		lineageTag: a89f60ab-8df2-4e30-9a86-10d364ff6dfb
+
+	measure 'Qtd Produzida' = SUM('BaseProdução'[Qtd Produzida])
+		formatString: #,0
+		lineageTag: 4897e24a-4d30-43bc-acec-f00e59acf087
+
+	measure Qualidade = [Qtd Produzida] / ([Qtd Produzida] + [Qtd Rejeitada])
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 029bc4df-5be8-48e0-9050-bdfcd9a7d1b0
+
+	measure 'Horas Produtivas' = ```
+			CALCULATE(
+			    SUM(
+			        'BaseProdução'[Horas]),
+			        'BaseProdução'[Ocorrência] = BLANK()
+			) 
+			```
+		lineageTag: f7a2dbc7-bc92-4769-bdfb-9768df59043e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Horas Paradas' = ```
+			CALCULATE(
+			    SUM('BaseProdução'[Horas]),
+			    'BaseProdução'[Ocorrência] <> BLANK()
+			) 
+			```
+		lineageTag: 9ba5e73d-baff-474c-87cf-4745a17cd1cc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Disponibilidade = [Horas Produtivas] / ([Horas Produtivas] + [Horas Paradas])
+		lineageTag: 1fcc0e20-70d2-42a4-8a52-a2886d76e446
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Produtividade' = ```
+			[Horas Produtivas] / [Total Horas] 
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 64020276-08d1-4085-b069-dac9cec80999
+
+	partition _Medidas = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Coluna 1" = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"Coluna 1", type text}}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Tipo Alterado",{"Coluna 1"})
+				in
+				    #"Colunas Removidas"
+
+	annotation PBI_ResultType = Table
+

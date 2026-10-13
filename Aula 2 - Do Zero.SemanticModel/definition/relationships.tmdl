@@ -1,0 +1,10 @@
+relationship 60639e88-de0e-4167-9670-23bf4c811b5f
+	joinOnDateBehavior: datePartOnly
+	fromColumn: BaseProdução.'Data Inicio'
+	toColumn: LocalDateTable_85935d94-4afa-4661-804b-ed77da819596.Date
+
+relationship 068ad7f2-381e-4aed-a2b3-6fe5e726fde7
+	joinOnDateBehavior: datePartOnly
+	fromColumn: BaseProdução.'Data Fim'
+	toColumn: LocalDateTable_dcf71d90-c564-4bc3-b930-7b891b9de0c3.Date
+
